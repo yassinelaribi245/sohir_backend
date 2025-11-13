@@ -5,10 +5,12 @@ use Illuminate\Database\Eloquent\Model;   // ← REQUIRED
 use Illuminate\Database\Eloquent\Relations\BelongsTo;   // optional but nice for type-hints
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable
 {
-    protected $fillable = ['name', 'email', 'password', 'role'];
+    use HasApiTokens;
+    protected $fillable = ['name', 'email', 'password', 'role', 'status'];
     protected $hidden   = ['password', 'remember_token'];
     protected $casts    = ['email_verified_at' => 'datetime'];
 

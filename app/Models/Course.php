@@ -16,6 +16,12 @@ class Course extends Model
     public function resources() {
         return $this->hasMany(CourseResource::class);
     }
+    
+    // Alias for compatibility
+    public function supports() {
+        return $this->resources();
+    }
+    
     public function quizzes() {
         return $this->hasMany(Quiz::class);
     }

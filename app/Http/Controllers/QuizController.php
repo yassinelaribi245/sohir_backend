@@ -9,7 +9,14 @@ class QuizController extends Controller
 {
     public function index(Request $request)
     {
-        return Quiz::with('course')->whereHas('course', fn($q) => $q->where('teacher_id', $request->user()->id))->latest()->get();
+        $query = Quiz::with('course')->whereHas('course', fn($q) => $q->where('teacher_id', $request->user()->id));
+        
+        // Filter by course_id if provided
+        if ($request->has('course_id')) {
+            $query->where('course_id', $request->input('course_id'));
+        }
+        
+        return $query->latest()->get();
     }
 
     public function store(Request $request)

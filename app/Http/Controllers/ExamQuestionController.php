@@ -26,7 +26,7 @@ class ExamQuestionController extends Controller
 
         $request->validate([
             'question'       => 'required|string',
-            'correct_answer' => 'required|string|max:191',
+            'correct_answer' => 'nullable|string', // Optional reference answer for teacher
         ]);
 
         return $exam->questions()->create($request->only(['question', 'correct_answer']));
@@ -39,9 +39,14 @@ class ExamQuestionController extends Controller
     {
         abort_unless($exam->course->teacher_id === $request->user()->id, 403);
 
+        // Check if exam has been passed by students - if so, don't allow editing questions
+        if ($exam->results()->exists()) {
+            abort(403, 'Cannot edit questions in exam that has been taken by students');
+        }
+
         $request->validate([
             'question'       => 'required|string',
-            'correct_answer' => 'required|string|max:191',
+            'correct_answer' => 'nullable|string', // Optional reference answer for teacher
         ]);
 
         $question->update($request->only(['question', 'correct_answer']));
@@ -55,6 +60,11 @@ class ExamQuestionController extends Controller
     public function destroy(Request $request, Exam $exam, ExamQuestion $question)
     {
         abort_unless($exam->course->teacher_id === $request->user()->id, 403);
+
+        // Check if exam has been passed by students - if so, don't allow deleting questions
+        if ($exam->results()->exists()) {
+            abort(403, 'Cannot delete questions from exam that has been taken by students');
+        }
 
         $question->delete();
 
